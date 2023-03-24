@@ -5,14 +5,14 @@ import lombok.Data;
 @Data
 public class DishDto {
 
-    private String name;
+    private String name="";
 
-    private String description;
+    private String description="";
 
-    private double price;
+    private double price=0.0;
 
-    private Long restaurantId;
+    private Long restaurantId=0L;
 
-    private String restaurantName;
+    private String restaurantName="";
 
 }

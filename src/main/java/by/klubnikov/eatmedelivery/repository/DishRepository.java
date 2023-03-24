@@ -12,4 +12,6 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     List<Dish> findAllByRestaurantId(Long id);
 
     List<Dish> findAllByRestaurantName(String restaurantName);
+
+    void deleteByIdAndRestaurant_Id(Long id, Long restaurantId);
 }

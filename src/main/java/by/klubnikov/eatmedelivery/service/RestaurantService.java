@@ -1,10 +1,12 @@
 package by.klubnikov.eatmedelivery.service;
 
+import by.klubnikov.eatmedelivery.converter.AddressConverter;
 import by.klubnikov.eatmedelivery.converter.DishConverter;
 import by.klubnikov.eatmedelivery.converter.RestaurantConverter;
 import by.klubnikov.eatmedelivery.dto.AddressDto;
 import by.klubnikov.eatmedelivery.dto.DishDto;
 import by.klubnikov.eatmedelivery.dto.RestaurantDto;
+import by.klubnikov.eatmedelivery.entity.Address;
 import by.klubnikov.eatmedelivery.entity.Dish;
 import by.klubnikov.eatmedelivery.entity.Restaurant;
 import by.klubnikov.eatmedelivery.repository.RestaurantRepository;
@@ -14,79 +16,71 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RestaurantService {
 
-    private final RestaurantRepository restaurantRepo;
+    private final RestaurantRepository repository;
 
-    private final RestaurantConverter restaurantConverter;
+    private final RestaurantConverter converter;
 
     private final DishService dishService;
 
     private final DishConverter dishConverter;
 
+    private final AddressConverter addressConverter;
+
+    private final AddressService addressService;
+
     public List<RestaurantDto> findAll() {
-        return restaurantRepo.findAll()
-                .stream()
-                .map(restaurantConverter::convertToDtoWithNameAndAddress)
-                .collect(Collectors.toList());
+        List<Restaurant> restaurants = repository.findAll();
+        return converter.convertToDto(restaurants);
     }
 
-    @Transactional
     public RestaurantDto findById(Long id) {
-        return restaurantRepo.findById(id)
-                .map(restaurantConverter::convertToDtoWithoutId)
+        return repository.findById(id)
+                .map(converter::convertToDto)
                 .orElseThrow();
     }
 
-    @Transactional
-    public List<DishDto> findAllDishes(Long restaurantId) {
-        return dishService.findDishesByRestaurantId(restaurantId)
-                .stream()
-                .map(dishConverter::convert)
-                .collect(Collectors.toList());
+    public RestaurantDto save(RestaurantDto restaurantDto) {
+        Restaurant restaurantToDb = converter.convertFromDto(restaurantDto);
+        Restaurant restaurant = repository.save(restaurantToDb);
+        return converter.convertToDto(restaurant);
     }
 
-    public RestaurantDto save(RestaurantDto restaurantDto, AddressDto addressDto) {
-        restaurantDto.setAddressDto(addressDto);
-        Restaurant restaurant = restaurantConverter.convertFromDtoWithNameAndAddress(restaurantDto);
-        restaurantRepo.save(restaurant);
-        return restaurantConverter.convertToDtoWithoutId(restaurant);
+    public RestaurantDto update(Long id, RestaurantDto restaurantDto) {
+        Restaurant restaurantFromDb = repository.findById(id).orElseThrow();
+        if (!restaurantDto.getName().isBlank())
+            restaurantFromDb.setName(restaurantDto.getName());
+        if (!restaurantDto.getDescription().isBlank())
+            restaurantFromDb.setDescription(restaurantDto.getDescription());
+        Restaurant restaurant = repository.save(restaurantFromDb);
+        return converter.convertToDto(restaurant);
     }
-
 
     public void deleteById(Long id) {
-        restaurantRepo.deleteById(id);
+        repository.deleteById(id);
     }
 
     @Transactional
-    public RestaurantDto saveDish(Long restaurantId, DishDto dishDto) {
-        Restaurant restaurant = restaurantRepo.findById(restaurantId)
+    public RestaurantDto saveDish(Long id, DishDto dishDto) {
+        Restaurant restaurantFromDb = repository.findById(id)
                 .orElseThrow();
-        Dish dish = dishConverter.convert(dishDto);
-        restaurant.addDish(dish);
-        restaurantRepo.save(restaurant);
-        return restaurantConverter.convertToDtoWithoutId(restaurant);
+        Dish dish = dishConverter.convertFromDto(dishDto);
+        restaurantFromDb.addDish(dish);
+        return converter.convertToDto(restaurantFromDb);
     }
 
-    @Transactional
-    public RestaurantDto deleteDish(Long restaurantId, Long dishId) {
-        Dish deletableDish = dishService.findDishesByRestaurantId(restaurantId)
-                .stream()
-                .filter(dish -> Objects.equals(dish.getId(), dishId))
-                .findAny()
-                .orElseThrow();
 
-        Restaurant restaurant = restaurantRepo.findById(restaurantId)
+    public RestaurantDto saveAddress(Long id, AddressDto addressDto) {
+        Restaurant restaurantFromDb = repository.findById(id)
                 .orElseThrow();
-
-        restaurant.getDishes().remove(deletableDish);
-        restaurantRepo.save(restaurant);
-        return restaurantConverter.convertToDtoWithoutId(restaurant);
+        Address address = addressService.save(addressDto);
+        restaurantFromDb.setAddress(address);
+        return converter.convertToDto(repository.save(restaurantFromDb));
     }
+
 }

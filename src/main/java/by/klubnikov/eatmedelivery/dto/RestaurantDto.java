@@ -1,19 +1,19 @@
 package by.klubnikov.eatmedelivery.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
 public class RestaurantDto {
-    private String name;
+    private String name="";
 
-    private AddressDto addressDto;
+    private AddressDto address = new AddressDto();
 
-    private List<DishDto> dishDtos;
+    private String description="";
 
-    private List<String> reviews;
+    private List<DishDto> dishes = new ArrayList<>();
+
+    private List<String> reviews = new ArrayList<>();
 }

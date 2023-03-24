@@ -5,7 +5,7 @@ import by.klubnikov.eatmedelivery.entity.Restaurant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -16,56 +16,37 @@ public class RestaurantConverter {
 
     private final AddressConverter addressConverter;
 
-
-    /**
-     * This restaurant DTO is using for restaurant's page
-     *
-     * @param restaurant - restaurant entity obtained from DB
-     * @return restaurant DTO without Id field
-     */
-    public RestaurantDto convertToDtoWithoutId(Restaurant restaurant) {
-        return RestaurantDto.builder()
-                .name(restaurant.getName())
-                .addressDto(addressConverter.convert(restaurant.getAddress()))
-                .dishDtos(restaurant.getDishes()
-                        .stream()
-                        .map(dishConverter::convert)
-                        .collect(Collectors.toList()))
-                .reviews(restaurant.getReviews())
-                .build();
+    public RestaurantDto convertToDto(Restaurant restaurant){
+        RestaurantDto restaurantDto = new RestaurantDto();
+        restaurantDto.setName(restaurant.getName());
+        restaurantDto.setAddress(addressConverter.convertToDto(restaurant.getAddress()));
+        restaurantDto.setDescription(restaurant.getDescription());
+        restaurantDto.setDishes(dishConverter.convertToDto(restaurant.getDishes()));
+        restaurantDto.setReviews(restaurant.getReviews());
+        return restaurantDto;
     }
 
-    /**
-     * This restaurant DTO is using for restaurants list page
-     *
-     * @param restaurant - restaurant entity obtained from DB
-     * @return restaurant DTO with name and address
-     */
-    public RestaurantDto convertToDtoWithNameAndAddress(Restaurant restaurant) {
-        return RestaurantDto.builder()
-                .name(restaurant.getName())
-                .addressDto(addressConverter.convert(restaurant.getAddress()))
-                .dishDtos(new ArrayList<>())
-                .reviews(new ArrayList<>())
-                .build();
-    }
-
-    public Restaurant convertFromDtoWithNameAndAddress(RestaurantDto restaurantDto){
-        Restaurant restaurant = new Restaurant();
-        restaurant.setName(restaurantDto.getName());
-        restaurant.setAddress(addressConverter.convert(restaurantDto.getAddressDto()));
-        return restaurant;
-    }
 
     public Restaurant convertFromDto(RestaurantDto restaurantDto) {
         Restaurant restaurant = new Restaurant();
         restaurant.setName(restaurantDto.getName());
-        restaurant.setAddress(addressConverter.convert(restaurantDto.getAddressDto()));
-        restaurant.setDishes(restaurantDto.getDishDtos()
-                .stream()
-                .map(dishConverter::convert)
-                .collect(Collectors.toList()));
+        restaurant.setAddress(addressConverter.convertFromDto(restaurantDto.getAddress()));
+        restaurant.setDescription(restaurantDto.getDescription());
+        restaurant.setDishes(dishConverter.convertFromDto(restaurantDto.getDishes()));
         restaurant.setReviews(restaurantDto.getReviews());
         return restaurant;
     }
+
+    public List<RestaurantDto> convertToDto(List<Restaurant> restaurants){
+        return restaurants.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<Restaurant> convertFromDto(List<RestaurantDto> restaurants){
+        return restaurants.stream()
+                .map(this::convertFromDto)
+                .collect(Collectors.toList());
+    }
 }
+

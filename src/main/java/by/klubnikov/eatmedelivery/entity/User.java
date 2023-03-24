@@ -1,6 +1,5 @@
 package by.klubnikov.eatmedelivery.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -57,7 +56,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JsonBackReference
     private List<Order> orders = new ArrayList<>();
 
     @Min(value = 18, message = "Your age should not be under 18 years old.")

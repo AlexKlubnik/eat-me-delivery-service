@@ -1,5 +1,6 @@
 package by.klubnikov.eatmedelivery.entity;
 
+import by.klubnikov.eatmedelivery.model.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -34,7 +35,7 @@ public class Order {
     @JoinColumn(name = "user_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JsonManagedReference
+//    @JsonManagedReference
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

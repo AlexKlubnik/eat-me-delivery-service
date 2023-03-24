@@ -1,4 +1,4 @@
-package by.klubnikov.eatmedelivery.entity;
+package by.klubnikov.eatmedelivery.model;
 
 import lombok.AllArgsConstructor;
 

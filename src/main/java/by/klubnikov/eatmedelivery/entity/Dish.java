@@ -29,7 +29,7 @@ public class Dish {
     @JoinColumn(name = "restaurant_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JsonManagedReference
+//    @JsonManagedReference
     private Restaurant restaurant;
 
 }

@@ -1,6 +1,5 @@
 package by.klubnikov.eatmedelivery.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -25,12 +24,13 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JsonBackReference
     private List<Dish> dishes = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
     private Address address;
+
+    private String description;
 
     @ElementCollection
     private List<String> reviews = new ArrayList<>();
