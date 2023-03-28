@@ -17,7 +17,7 @@ public class Dish {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty
+    @NotEmpty(message = "Name of dish can't be empty.")
     private String name;
 
     @Column(length = 500)
@@ -29,7 +29,6 @@ public class Dish {
     @JoinColumn(name = "restaurant_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-//    @JsonManagedReference
     private Restaurant restaurant;
 
 }

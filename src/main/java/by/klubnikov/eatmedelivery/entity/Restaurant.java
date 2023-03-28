@@ -1,5 +1,6 @@
 package by.klubnikov.eatmedelivery.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty
+    @NotEmpty(message = "The restaurant's name can not be empty")
     private String name;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -30,6 +31,7 @@ public class Restaurant {
     @JoinColumn
     private Address address;
 
+    @NotEmpty(message = "The restaurant's name can not be empty")
     private String description;
 
     @ElementCollection

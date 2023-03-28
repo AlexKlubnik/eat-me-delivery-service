@@ -3,14 +3,8 @@ package by.klubnikov.eatmedelivery.dto;
 import lombok.Data;
 
 @Data
-public class DishDto {
+public class DishListView {
 
     private String name;
-
-    private String description;
-
     private double price;
-
-    private String restaurantName;
-
 }

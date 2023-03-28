@@ -1,6 +1,8 @@
 package by.klubnikov.eatmedelivery.converter;
 
 import by.klubnikov.eatmedelivery.dto.RestaurantDto;
+import by.klubnikov.eatmedelivery.dto.RestaurantListView;
+import by.klubnikov.eatmedelivery.dto.RestaurantPageView;
 import by.klubnikov.eatmedelivery.entity.Restaurant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,37 +18,60 @@ public class RestaurantConverter {
 
     private final AddressConverter addressConverter;
 
-    public RestaurantDto convertToDto(Restaurant restaurant){
+    public RestaurantDto convert(Restaurant restaurant){
         RestaurantDto restaurantDto = new RestaurantDto();
         restaurantDto.setName(restaurant.getName());
-        restaurantDto.setAddress(addressConverter.convertToDto(restaurant.getAddress()));
+        restaurantDto.setAddress(addressConverter.convert(restaurant.getAddress()));
         restaurantDto.setDescription(restaurant.getDescription());
-        restaurantDto.setDishes(dishConverter.convertToDto(restaurant.getDishes()));
+        restaurantDto.setDishes(dishConverter.convertListToDto(restaurant.getDishes()));
         restaurantDto.setReviews(restaurant.getReviews());
         return restaurantDto;
     }
 
+    public RestaurantListView convertToListView(Restaurant restaurant){
+        RestaurantListView restaurantDto = new RestaurantListView();
+        restaurantDto.setName(restaurant.getName());
+        restaurantDto.setAddress(addressConverter.convert(restaurant.getAddress()));
+        return restaurantDto;
+    }
 
-    public Restaurant convertFromDto(RestaurantDto restaurantDto) {
+    public List<RestaurantListView> convertToListView(List <Restaurant> restaurants) {
+        return restaurants.stream()
+                .map(this::convertToListView)
+                .collect(Collectors.toList());
+    }
+
+    public RestaurantPageView convertToPageView(Restaurant restaurant){
+        RestaurantPageView restaurantDto = new RestaurantPageView();
+        restaurantDto.setName(restaurant.getName());
+        restaurantDto.setAddress(addressConverter.convert(restaurant.getAddress()));
+        restaurantDto.setDescription(restaurant.getDescription());
+        return restaurantDto;
+    }
+
+    public Restaurant convertFromPageView(RestaurantPageView restaurantDto){
         Restaurant restaurant = new Restaurant();
         restaurant.setName(restaurantDto.getName());
-        restaurant.setAddress(addressConverter.convertFromDto(restaurantDto.getAddress()));
+        restaurant.setAddress(addressConverter.convert(restaurantDto.getAddress()));
         restaurant.setDescription(restaurantDto.getDescription());
-        restaurant.setDishes(dishConverter.convertFromDto(restaurantDto.getDishes()));
+        return restaurant;
+    }
+
+    public Restaurant convert(RestaurantDto restaurantDto) {
+        Restaurant restaurant = new Restaurant();
+        restaurant.setName(restaurantDto.getName());
+        restaurant.setAddress(addressConverter.convert(restaurantDto.getAddress()));
+        restaurant.setDescription(restaurantDto.getDescription());
+        restaurant.setDishes(dishConverter.convertListFromDto(restaurantDto.getDishes()));
         restaurant.setReviews(restaurantDto.getReviews());
         return restaurant;
     }
 
-    public List<RestaurantDto> convertToDto(List<Restaurant> restaurants){
+    public List<RestaurantDto> convert(List<Restaurant> restaurants){
         return restaurants.stream()
-                .map(this::convertToDto)
+                .map(this::convert)
                 .collect(Collectors.toList());
     }
 
-    public List<Restaurant> convertFromDto(List<RestaurantDto> restaurants){
-        return restaurants.stream()
-                .map(this::convertFromDto)
-                .collect(Collectors.toList());
-    }
 }
 

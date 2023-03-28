@@ -1,6 +1,7 @@
 package by.klubnikov.eatmedelivery.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,6 +15,7 @@ public class OrderLine {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Min(value = 0, message = "This field can not be negative number")
     private int quantity;
 
     @ManyToOne
