@@ -5,6 +5,7 @@ import by.klubnikov.eatmedelivery.dto.DishDto;
 import by.klubnikov.eatmedelivery.dto.DishListView;
 import by.klubnikov.eatmedelivery.entity.Dish;
 import by.klubnikov.eatmedelivery.entity.Restaurant;
+import by.klubnikov.eatmedelivery.error.ResourceNotFoundException;
 import by.klubnikov.eatmedelivery.repository.DishRepository;
 import by.klubnikov.eatmedelivery.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,15 +30,17 @@ public class DishService {
                 .findAllByRestaurantId(restaurantId));
     }
 
-    public DishDto findByRestaurantIdAndId(Long restaurantId, Long id){
+    public DishDto findByRestaurantIdAndId(Long restaurantId, Long id) {
         Dish dish = repository.findByRestaurantIdAndId(restaurantId, id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + restaurantId + "  or dish with id " + id + " not found"));
         return converter.convert(dish);
     }
 
     public DishListView save(Long restaurantId, DishDto dish) {
         Restaurant restaurantFromDb = restaurantRepository.findById(restaurantId)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + restaurantId + " not found"));
         Dish dishToSave = converter.convert(dish);
         dishToSave.setRestaurant(restaurantFromDb);
         Dish savedDish = repository.save(dishToSave);
@@ -45,7 +48,9 @@ public class DishService {
     }
 
     public DishDto save(Long restaurantId, Long id, DishDto dish) {
-        Dish dishFromDb = repository.findById(id).orElseThrow();
+        Dish dishFromDb = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Dish with id " + id + " not found"));
         Long restaurantIdFromDb = dishFromDb.getRestaurant().getId();
         if (Objects.equals(restaurantId, restaurantIdFromDb)) {
             checkAndChangeDish(dish, dishFromDb);
@@ -65,11 +70,12 @@ public class DishService {
 
     public void deleteByRestaurantIdAndId(Long restaurantId, Long id) {
         Long checkableId = repository.findById(id)
-                .orElseThrow()
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Dish with id " + id + " not found"))
                 .getRestaurant()
                 .getId();
-        if (Objects.equals(checkableId, restaurantId)){
-         repository.deleteById(id);
+        if (Objects.equals(checkableId, restaurantId)) {
+            repository.deleteById(id);
         }
     }
 

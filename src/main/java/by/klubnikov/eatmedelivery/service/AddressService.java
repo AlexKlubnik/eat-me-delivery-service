@@ -3,12 +3,10 @@ package by.klubnikov.eatmedelivery.service;
 import by.klubnikov.eatmedelivery.converter.AddressConverter;
 import by.klubnikov.eatmedelivery.dto.AddressDto;
 import by.klubnikov.eatmedelivery.entity.Address;
+import by.klubnikov.eatmedelivery.error.ResourceNotFoundException;
 import by.klubnikov.eatmedelivery.repository.AddressRepository;
-import by.klubnikov.eatmedelivery.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +16,9 @@ public class AddressService {
 
 
     public AddressDto findById(Long id) {
-        Address address = repository.findById(id).orElseThrow();
+        Address address = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Address with id " + id + " not found"));
         return converter.convert(address);
     }
 
@@ -28,7 +28,7 @@ public class AddressService {
         if (repository.findById(id).isPresent()) {
             Address address = converter.convert(addressDto);
             address.setId(id);
-            returnableAddress=converter.convert(repository.save(address));
+            returnableAddress = converter.convert(repository.save(address));
         }
         return returnableAddress;
     }

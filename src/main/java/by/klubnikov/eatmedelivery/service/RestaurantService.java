@@ -1,10 +1,11 @@
 package by.klubnikov.eatmedelivery.service;
 
-import by.klubnikov.eatmedelivery.converter.DishConverter;
 import by.klubnikov.eatmedelivery.converter.RestaurantConverter;
-import by.klubnikov.eatmedelivery.dto.*;
-import by.klubnikov.eatmedelivery.entity.Address;
+import by.klubnikov.eatmedelivery.dto.AddressDto;
+import by.klubnikov.eatmedelivery.dto.RestaurantListView;
+import by.klubnikov.eatmedelivery.dto.RestaurantPageView;
 import by.klubnikov.eatmedelivery.entity.Restaurant;
+import by.klubnikov.eatmedelivery.error.ResourceNotFoundException;
 import by.klubnikov.eatmedelivery.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +33,8 @@ public class RestaurantService {
     public RestaurantPageView findById(Long id) {
         return repository.findById(id)
                 .map(converter::convertToPageView)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
     }
 
 
@@ -46,7 +47,9 @@ public class RestaurantService {
 
 
     public RestaurantPageView save(Long id, RestaurantPageView restaurant, AddressDto address) {
-        Restaurant restaurantFromDb = repository.findById(id).orElseThrow();
+        Restaurant restaurantFromDb = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
         Long addressId = restaurantFromDb.getAddress().getId();
         addressService.save(addressId, address);
         if (!restaurant.getName().equals(restaurantFromDb.getName()))
@@ -64,12 +67,16 @@ public class RestaurantService {
     @Transactional
     public List<String> findAllReviews(Long id) {
         return repository.findById(id)
-                .orElseThrow().getReviews();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"))
+                .getReviews();
     }
 
     @Transactional
     public void deleteReview(Long id, String review) {
-        Restaurant restaurant = repository.findById(id).orElseThrow();
+        Restaurant restaurant = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
         if (restaurant.getReviews()
                 .stream()
                 .anyMatch(r -> r.equals(review))) {
