@@ -1,10 +1,6 @@
 package by.klubnikov.eatmedelivery.controller;
 
-import by.klubnikov.eatmedelivery.dto.DishDto;
-import by.klubnikov.eatmedelivery.dto.DishListView;
-import by.klubnikov.eatmedelivery.dto.RestaurantListView;
-import by.klubnikov.eatmedelivery.dto.RestaurantPageView;
-import by.klubnikov.eatmedelivery.service.AddressService;
+import by.klubnikov.eatmedelivery.dto.*;
 import by.klubnikov.eatmedelivery.service.DishService;
 import by.klubnikov.eatmedelivery.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -55,8 +51,8 @@ public class RestaurantController {
     }
 
     @PutMapping("{id}/reviews")
-    public String updateReview(@PathVariable Long id, @RequestBody String review, @RequestBody String updatedReview){
-        return restaurantService.updateReview(id, review, updatedReview);
+    public String updateReview(@PathVariable Long id, UpdateReviewForm form){
+        return restaurantService.updateReview(id, form);
     }
 
     @DeleteMapping("{id}/reviews")
