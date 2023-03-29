@@ -73,6 +73,29 @@ public class RestaurantService {
     }
 
     @Transactional
+    public List<String> saveReview(Long id, String review) {
+        Restaurant restaurant = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
+        List<String> reviews = restaurant.getReviews();
+        reviews.add(review);
+        return reviews;
+    }
+
+    @Transactional
+    public String updateReview(Long id, String review, String updatedReview) {
+        Restaurant restaurant = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
+        List<String> reviews = restaurant.getReviews();
+        return reviews.stream()
+                .filter(r -> r.equals(review))
+                .map(r -> updatedReview)
+                .findAny()
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+    }
+
+    @Transactional
     public void deleteReview(Long id, String review) {
         Restaurant restaurant = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -81,6 +104,7 @@ public class RestaurantService {
                 .stream()
                 .anyMatch(r -> r.equals(review))) {
             restaurant.getReviews().remove(review);
+            repository.save(restaurant);
         }
     }
 

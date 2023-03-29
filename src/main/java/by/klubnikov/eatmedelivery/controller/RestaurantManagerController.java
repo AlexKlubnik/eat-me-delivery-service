@@ -21,7 +21,6 @@ public class RestaurantManagerController {
 
     private final DishService dishService;
 
-    private final AddressService addressService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
