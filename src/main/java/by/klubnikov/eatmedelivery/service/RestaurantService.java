@@ -4,6 +4,7 @@ import by.klubnikov.eatmedelivery.converter.RestaurantConverter;
 import by.klubnikov.eatmedelivery.dto.AddressDto;
 import by.klubnikov.eatmedelivery.dto.RestaurantListView;
 import by.klubnikov.eatmedelivery.dto.RestaurantPageView;
+import by.klubnikov.eatmedelivery.dto.UpdateReviewForm;
 import by.klubnikov.eatmedelivery.entity.Restaurant;
 import by.klubnikov.eatmedelivery.error.ResourceNotFoundException;
 import by.klubnikov.eatmedelivery.repository.RestaurantRepository;
@@ -73,6 +74,31 @@ public class RestaurantService {
     }
 
     @Transactional
+    public List<String> saveReview(Long id, String review) {
+        Restaurant restaurant = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
+        List<String> reviews = restaurant.getReviews();
+        reviews.add(review);
+        return reviews;
+    }
+
+    @Transactional
+    public String updateReview(Long id, UpdateReviewForm form) {
+        Restaurant restaurant = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
+        List<String> reviews = restaurant.getReviews();
+        reviews.replaceAll(r -> r.equals(form.getReview()) ? form.getUpdatedReview() : r);
+        String savedReview = repository.save(restaurant).getReviews()
+                .stream()
+                .filter(r -> r.equals(form.getUpdatedReview()))
+                .findAny()
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+        return savedReview;
+    }
+
+    @Transactional
     public void deleteReview(Long id, String review) {
         Restaurant restaurant = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -81,6 +107,7 @@ public class RestaurantService {
                 .stream()
                 .anyMatch(r -> r.equals(review))) {
             restaurant.getReviews().remove(review);
+            repository.save(restaurant);
         }
     }
 
