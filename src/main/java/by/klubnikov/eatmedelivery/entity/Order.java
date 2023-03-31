@@ -28,8 +28,11 @@ public class Order {
     private String comment;
 
     @OneToOne
+
     @JoinColumn
     private Address destinationAddress;
+
+    private double totalPrice;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

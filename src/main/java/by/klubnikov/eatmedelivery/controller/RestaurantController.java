@@ -3,6 +3,7 @@ package by.klubnikov.eatmedelivery.controller;
 import by.klubnikov.eatmedelivery.dto.*;
 import by.klubnikov.eatmedelivery.service.DishService;
 import by.klubnikov.eatmedelivery.service.RestaurantService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("restaurants")
+@SecurityRequirement(name = "JWT")
 public class RestaurantController {
 
     private final RestaurantService restaurantService;

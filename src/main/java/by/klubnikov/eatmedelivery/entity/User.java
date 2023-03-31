@@ -49,7 +49,6 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-
     @ElementCollection
     private List<String> phoneNumbers = new ArrayList<>();
 

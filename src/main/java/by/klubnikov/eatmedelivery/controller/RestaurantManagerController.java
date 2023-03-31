@@ -1,9 +1,9 @@
 package by.klubnikov.eatmedelivery.controller;
 
 import by.klubnikov.eatmedelivery.dto.*;
-import by.klubnikov.eatmedelivery.service.AddressService;
 import by.klubnikov.eatmedelivery.service.DishService;
 import by.klubnikov.eatmedelivery.service.RestaurantService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("restaurants-manager")
+@SecurityRequirement(name = "JWT")
 @Slf4j
 public class RestaurantManagerController {
 
