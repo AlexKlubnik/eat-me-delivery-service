@@ -1,14 +1,24 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/myDB?useSSL=false
-    username:
-    password:
+    url: jdbc:postgresql://database:5432/deliverydb?useSSL=false
+    username: postgres0
+    password: 123root
     driver-class-name: org.postgresql.Driver
+
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-#  jwt:
-#    secret: *******
+
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+
+jwt:
+  secret: 25442A472D4B6150645367566B59703373367638792F423F4528482B4D625165
