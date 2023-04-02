@@ -23,11 +23,12 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/restaurants").permitAll()
-                .requestMatchers( "auth/registration", "auth/login").permitAll()
                 .requestMatchers("/restaurants-manager/**").hasRole("MANAGER")
                 .requestMatchers("/restaurants/{id}/**").hasRole("USER")
+                .requestMatchers( "/auth/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/restaurants").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

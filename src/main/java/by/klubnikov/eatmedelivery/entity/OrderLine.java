@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Primary;
 
 @Data
 @Entity
+@Table(name = "delivery_order_lines")
 public class OrderLine {
 
     @Id

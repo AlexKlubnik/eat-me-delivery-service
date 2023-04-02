@@ -7,17 +7,20 @@ import by.klubnikov.eatmedelivery.dto.UserRegistration;
 import by.klubnikov.eatmedelivery.entity.User;
 import by.klubnikov.eatmedelivery.jwt.JwtTokenUtil;
 import by.klubnikov.eatmedelivery.service.UserService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("auth")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")
 public class AuthController {
 
     private final UserService service;
-    private final JwtTokenUtil tokenUtil;
 
     @PostMapping("registration")
     @ResponseStatus(HttpStatus.CREATED)
@@ -26,14 +29,9 @@ public class AuthController {
     }
 
     @PostMapping("login")
+    @ResponseStatus(HttpStatus.CREATED)
     public UserAuthResponse login(@RequestBody UserAuthRequest authRequest) {
-        User user = service.getUserForTokenIfExists(authRequest);
-        return new UserAuthResponse(tokenUtil.generateToken(user.getLogin()));
+        String token = service.getTokenForUserIfExists(authRequest);
+        return new UserAuthResponse(token);
     }
-
-//    @PostMapping("login")
-//    public AuthResponse login(@RequestBody AuthRequest authRequest) {
-//        User user = userService.getTokenForUserIfExists(authRequest);
-//        return new AuthResponse(tokenUtil.generateToken(user.getLogin()));
-//    }
 }

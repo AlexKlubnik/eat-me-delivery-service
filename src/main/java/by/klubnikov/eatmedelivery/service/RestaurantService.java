@@ -103,9 +103,8 @@ public class RestaurantService {
         Restaurant restaurant = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Restaurant with id " + id + " not found"));
-        if (restaurant.getReviews()
-                .stream()
-                .anyMatch(r -> r.equals(review))) {
+        System.out.println("Print restaurant: " + restaurant);
+        if (restaurant.getReviews().contains(review)) {
             restaurant.getReviews().remove(review);
             repository.save(restaurant);
         }
