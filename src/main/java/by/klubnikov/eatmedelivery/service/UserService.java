@@ -31,7 +31,6 @@ public class UserService {
         User savableUser = converter.convert(user);
         savableUser.setRole(roleRepository.findById(2L)
                 .orElseThrow());
-        System.out.println("Does password matches? " + checkPassword(user.getPassword()));
         savableUser.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = repository.save(savableUser);
         return converter.convert(savedUser);
@@ -54,12 +53,6 @@ public class UserService {
         User user = findByLoginAndCheckPassword(authRequest.getLogin(), authRequest.getPassword())
                 .orElseThrow();
         return tokenUtil.generateToken(user.getLogin());
-    }
-
-    private boolean checkPassword(String password) {
-        Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.[@#$%^&-+=()]*)(?=\\S+$).{6,20}$");
-        Matcher matcher = pattern.matcher(password);
-        return matcher.matches();
     }
 
 }

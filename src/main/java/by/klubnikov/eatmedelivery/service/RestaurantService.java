@@ -38,19 +38,17 @@ public class RestaurantService {
                         "Restaurant with id " + id + " not found"));
     }
 
-
-    public RestaurantListView save(RestaurantPageView restaurant, AddressDto address) {
-        restaurant.setAddress(address);
+    public RestaurantListView save(RestaurantPageView restaurant) {;
         Restaurant restaurantToDb = converter.convertFromPageView(restaurant);
         Restaurant savedRestaurant = repository.save(restaurantToDb);
         return converter.convertToListView(savedRestaurant);
     }
 
-
-    public RestaurantPageView save(Long id, RestaurantPageView restaurant, AddressDto address) {
+    public RestaurantPageView save(Long id, RestaurantPageView restaurant) {
         Restaurant restaurantFromDb = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Restaurant with id " + id + " not found"));
+        AddressDto address = restaurant.getAddress();
         Long addressId = restaurantFromDb.getAddress().getId();
         addressService.save(addressId, address);
         if (!restaurant.getName().equals(restaurantFromDb.getName()))
@@ -84,18 +82,13 @@ public class RestaurantService {
     }
 
     @Transactional
-    public String updateReview(Long id, UpdateReviewForm form) {
+    public List<String> updateReview(Long id, UpdateReviewForm form) {
         Restaurant restaurant = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Restaurant with id " + id + " not found"));
         List<String> reviews = restaurant.getReviews();
         reviews.replaceAll(r -> r.equals(form.getReview()) ? form.getUpdatedReview() : r);
-        String savedReview = repository.save(restaurant).getReviews()
-                .stream()
-                .filter(r -> r.equals(form.getUpdatedReview()))
-                .findAny()
-                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-        return savedReview;
+        return repository.save(restaurant).getReviews();
     }
 
     @Transactional
@@ -109,5 +102,4 @@ public class RestaurantService {
             repository.save(restaurant);
         }
     }
-
 }
