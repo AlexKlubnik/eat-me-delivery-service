@@ -38,7 +38,7 @@ public class RestaurantService {
                         "Restaurant with id " + id + " not found"));
     }
 
-    public RestaurantListView save(RestaurantPageView restaurant) {;
+    public RestaurantListView save(RestaurantPageView restaurant) {
         Restaurant restaurantToDb = converter.convertFromPageView(restaurant);
         Restaurant savedRestaurant = repository.save(restaurantToDb);
         return converter.convertToListView(savedRestaurant);
