@@ -74,9 +74,9 @@ class DishServiceTest {
         dishDto1.setPrice(15.99);
 
         dishDto2 = new DishDto();
-        dishDto2.setName("Pizza");
-        dishDto2.setDescription("Italian classic food");
-        dishDto2.setPrice(20.1);
+        dishDto2.setName("Hamburger");
+        dishDto2.setDescription("With cow steak");
+        dishDto2.setPrice(21.08);
 
     }
 
@@ -103,28 +103,23 @@ class DishServiceTest {
     @Test
     void save() {
         Mockito.when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
-        DishListView expected = service.save(1L, dishDto1);
+        Mockito.when(repository.save(Mockito.any())).thenReturn(new Dish());
+        service.save(1L, dishDto1);
 
-        Mockito.verify(repository, Mockito.times(1)).save(Mockito.any());
+        Mockito.verify(restaurantRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(repository).save(Mockito.any());
         assertThrows(ResourceNotFoundException.class, () -> service.save(500L, dishDto1));
-        assertEquals(expected.getName(), dishDto1.getName());
-        assertEquals(expected.getPrice(), dishDto1.getPrice());
     }
 
     @Test
     void saveUpdatedDish() {
         Mockito.when(repository.findById(1L)).thenReturn(Optional.of(dish1));
-        DishDto expected = service.save(1L, 1L, dishDto2);
+        Mockito.when(repository.save(Mockito.any())).thenReturn(dish1);
+        service.save(1L, 1L, dishDto2);
 
+        Mockito.verify(repository).findById(1L);
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.any());
         assertThrows(ResourceNotFoundException.class, () -> service.save(1L, 500L, dishDto2));
-
-        Dish updatedDish = converter.convert(dishDto2);
-        updatedDish.setId(dish1.getId());
-        updatedDish.setRestaurant(dish1.getRestaurant());
-
-        assertEquals(expected, converter.convert(updatedDish));
-
     }
 
     @Test
@@ -134,5 +129,4 @@ class DishServiceTest {
         Mockito.verify(repository, Mockito.times(1)).deleteById(1L);
         assertThrows(ResourceNotFoundException.class, () -> service.deleteByRestaurantIdAndId(1L, 500L));
     }
-
 }

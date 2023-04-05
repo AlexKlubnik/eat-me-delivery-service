@@ -3,9 +3,9 @@ package by.klubnikov.eatmedelivery.service;
 import by.klubnikov.eatmedelivery.converter.AddressConverter;
 import by.klubnikov.eatmedelivery.converter.DishConverter;
 import by.klubnikov.eatmedelivery.converter.RestaurantConverter;
-import by.klubnikov.eatmedelivery.dto.AddressDto;
 import by.klubnikov.eatmedelivery.dto.RestaurantListView;
 import by.klubnikov.eatmedelivery.dto.RestaurantPageView;
+import by.klubnikov.eatmedelivery.dto.UpdateReviewForm;
 import by.klubnikov.eatmedelivery.entity.Address;
 import by.klubnikov.eatmedelivery.entity.Restaurant;
 import by.klubnikov.eatmedelivery.error.ResourceNotFoundException;
@@ -21,8 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RestaurantServiceTest {
 
@@ -39,6 +38,7 @@ class RestaurantServiceTest {
     private Address address2;
     private Restaurant restaurant1;
     private Restaurant restaurant2;
+    private UpdateReviewForm updateReviewForm;
 
     @BeforeEach
     void setUp() {
@@ -73,6 +73,8 @@ class RestaurantServiceTest {
         restaurant1.setAddress(address1);
         restaurant1.setDishes(new ArrayList<>());
         restaurant1.setReviews(new ArrayList<>());
+        restaurant1.getReviews().add("Nice restaurant");
+        restaurant1.getReviews().add("Bad restaurant");
 
         restaurant2 = new Restaurant();
         restaurant2.setId(2L);
@@ -82,6 +84,9 @@ class RestaurantServiceTest {
         restaurant2.setDishes(new ArrayList<>());
         restaurant2.setReviews(new ArrayList<>());
 
+        updateReviewForm = new UpdateReviewForm();
+        updateReviewForm.setReview(restaurant1.getReviews().get(0));
+        updateReviewForm.setUpdatedReview("Updated review");
     }
 
     @Test
@@ -126,26 +131,54 @@ class RestaurantServiceTest {
         assertEquals(expected.getName(), updatedRestaurant.getName());
         assertEquals(expected.getDescription(), updatedRestaurant.getDescription());
         assertEquals(expected.getAddress(), updatedRestaurant.getAddress());
-
     }
 
     @Test
     void deleteById() {
+        service.deleteById(1L);
+        Mockito.verify(repository, Mockito.times(1)).deleteById(1L);
     }
 
     @Test
     void findAllReviews() {
+        Mockito.when(repository.findById(1L)).thenReturn(Optional.of(restaurant1));
+        service.findAllReviews(1L);
+        Mockito.verify(repository, Mockito.times(1)).findById(1L);
+        assertThrows(ResourceNotFoundException.class, () -> service.findAllReviews(500L));
     }
 
     @Test
     void saveReview() {
+        Mockito.when(repository.findById(1L)).thenReturn(Optional.of(restaurant1));
+        List<String> expected = service.saveReview(1L, "New review");
+        Mockito.verify(repository, Mockito.times(1)).findById(1L);
+        assertThrows(ResourceNotFoundException.class, () -> service.saveReview(500L, "New review"));
+        assertEquals(expected.size(), 3);
+        assertTrue(expected
+                .stream()
+                .anyMatch(review -> review.equals("New review")));
     }
 
     @Test
     void updateReview() {
+        Mockito.when(repository.findById(1L)).thenReturn(Optional.of(restaurant1));
+        Mockito.when(repository.save(Mockito.any())).thenReturn(new Restaurant());
+        service.updateReview(1L, updateReviewForm);
+        Mockito.verify(repository, Mockito.times(1)).findById(1L);
+        Mockito.verify(repository, Mockito.times(1)).save(Mockito.any());
+        assertThrows(ResourceNotFoundException.class, () -> service.updateReview(500L, updateReviewForm));
     }
 
     @Test
     void deleteReview() {
+        String removableReview = restaurant1.getReviews().get(0);
+        Mockito.when(repository.findById(1L)).thenReturn(Optional.of(restaurant1));
+        service.deleteReview(1L, removableReview);
+        Mockito.verify(repository, Mockito.times(1)).findById(1L);
+        assertThrows(ResourceNotFoundException.class, () -> service.deleteReview(500L, removableReview));
+        assertEquals(restaurant1.getReviews().size(), 1);
+        assertTrue(restaurant1.getReviews()
+                .stream()
+                .noneMatch(review -> review.equals(removableReview)));
     }
 }
