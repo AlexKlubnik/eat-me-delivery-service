@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public Optional<User> findByLoginAndCheckPassword(String login, String password) {
-        User user = findByLogin(login).orElseThrow(() -> new ResourceNotFoundException(
+        User user = repository.findByLogin(login).orElseThrow(() -> new ResourceNotFoundException(
                 "User with login " + login + " not found"));
         if (passwordEncoder.matches(password, user.getPassword())) {
             return Optional.of(user);
