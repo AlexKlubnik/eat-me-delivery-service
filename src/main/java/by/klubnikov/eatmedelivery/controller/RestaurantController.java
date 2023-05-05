@@ -128,7 +128,7 @@ public class RestaurantController {
         return dishService.findAllByRestaurantId(id);
     }
 
-    @Operation(summary = "Finds dish",
+    @Operation(summary = "Find dish",
             description = "Returns specific dish of specific restaurant",
             responses = {@ApiResponse(responseCode = "200",
                     description = "Returns dish with it's name, description, price and restaurant's name",
@@ -178,7 +178,7 @@ public class RestaurantController {
         return restaurantService.findAllReviews(id);
     }
 
-    @Operation(summary = "Add review method",
+    @Operation(summary = "Add review",
             description = "Allows to add new review to specific restaurant",
             responses = {@ApiResponse(responseCode = "201", description = "List of reviews with new one",
                     content = {@Content(mediaType = "application/json",
@@ -209,7 +209,7 @@ public class RestaurantController {
         return restaurantService.saveReview(id, review);
     }
 
-    @Operation(summary = "Update review method",
+    @Operation(summary = "Update review",
             description = "Allows to update specific review of the restaurant",
             responses = {@ApiResponse(responseCode = "200", description = "List of reviews with new one",
                     content = {@Content(mediaType = "application/json",
@@ -245,7 +245,7 @@ public class RestaurantController {
         return restaurantService.updateReview(id, form);
     }
 
-    @Operation(summary = "Delete review method",
+    @Operation(summary = "Delete review",
             description = "Allows to delete review of specific restaurant",
             responses = {@ApiResponse(responseCode = "204", description = "Returns no content",
                     content = @Content),

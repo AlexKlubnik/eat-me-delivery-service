@@ -51,12 +51,16 @@ public class RestaurantService {
         AddressDto address = restaurant.getAddress();
         Long addressId = restaurantFromDb.getAddress().getId();
         addressService.save(addressId, address);
+        checkAndChangeRestaurant(restaurant, restaurantFromDb);
+        Restaurant savedRestaurant = repository.save(restaurantFromDb);
+        return converter.convertToPageView(savedRestaurant);
+    }
+
+    private void checkAndChangeRestaurant(RestaurantPageView restaurant, Restaurant restaurantFromDb) {
         if (!restaurant.getName().equals(restaurantFromDb.getName()))
             restaurantFromDb.setName(restaurant.getName());
         if (!restaurant.getDescription().equals(restaurantFromDb.getDescription()))
             restaurantFromDb.setDescription(restaurant.getDescription());
-        Restaurant savedRestaurant = repository.save(restaurantFromDb);
-        return converter.convertToPageView(savedRestaurant);
     }
 
     public void deleteById(Long id) {

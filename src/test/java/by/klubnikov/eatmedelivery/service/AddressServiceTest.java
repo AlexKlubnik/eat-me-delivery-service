@@ -3,66 +3,63 @@ package by.klubnikov.eatmedelivery.service;
 import by.klubnikov.eatmedelivery.converter.AddressConverter;
 import by.klubnikov.eatmedelivery.dto.AddressDto;
 import by.klubnikov.eatmedelivery.entity.Address;
+import by.klubnikov.eatmedelivery.error.ResourceNotFoundException;
 import by.klubnikov.eatmedelivery.repository.AddressRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class AddressServiceTest {
-
-    @Mock
     private AddressRepository repository;
-    @Spy
     private AddressService service;
     private AddressDto addressDto;
     private Address address;
-    private Address addressWithoutId;
 
     @BeforeEach
     void setUp() {
-        repository = Mockito.mock(AddressRepository.class);
+        repository = mock(AddressRepository.class);
         AddressConverter converter = new AddressConverter();
-        service = Mockito.spy(new AddressService(repository, converter));
+        service = spy(new AddressService(repository, converter));
+        initAddress();
+        initAddressDto();
+    }
 
-        addressDto = new AddressDto();
-        addressDto.setCity("Brest");
-        addressDto.setStreet("Berezovka");
-        addressDto.setHouseNumber(11);
-        addressDto.setBuildingNumber(1);
-        addressDto.setApartmentNumber(14);
-
+    private void initAddress() {
         address = new Address();
         address.setId(1L);
-        address.setCity("Brest");
-        address.setStreet("Berezovka");
-        address.setHouseNumber(11);
-        address.setBuildingNumber(1);
-        address.setApartmentNumber(14);
+        address.setCity("Gomel");
+        address.setStreet("Malinovka");
+        address.setHouseNumber(12);
+        address.setBuildingNumber(0);
+        address.setApartmentNumber(22);
+    }
 
-        addressWithoutId = new Address();
-        addressWithoutId.setId(1L);
-        addressWithoutId.setCity("Brest");
-        addressWithoutId.setStreet("Berezovka");
-        addressWithoutId.setHouseNumber(11);
-        addressWithoutId.setBuildingNumber(1);
-        addressWithoutId.setApartmentNumber(14);
+    private void initAddressDto() {
+        addressDto = new AddressDto();
+        addressDto.setCity("Gomel");
+        addressDto.setStreet("Malinovka");
+        addressDto.setHouseNumber(12);
+        addressDto.setBuildingNumber(0);
+        addressDto.setApartmentNumber(22);
     }
 
     @Test
-    void save() {
-        Mockito.when(repository.findById(1L)).thenReturn(Optional.of(address));
-        Mockito.when(repository.save(addressWithoutId)).thenReturn(address);
+    void save_WhenAddressExists() {
+        when(repository.existsById(1L)).thenReturn(true);
+        when(repository.save(any(Address.class))).thenReturn(address);
         AddressDto expected = service.save(1L, addressDto);
-        Mockito.verify(repository, Mockito.times(1)).findById(1L);
-        Mockito.verify(repository, Mockito.times(1)).save(address);
-        Assertions.assertNotNull(expected);
-        Assertions.assertEquals(expected, addressDto);
+        verify(repository, times(1)).existsById(1L);
+        verify(repository, times(1)).save(any(Address.class));
+        verifyNoMoreInteractions(repository);
+        assertEquals(expected, addressDto);
+    }
+
+    @Test
+    void save_WhenAddressNotExists() {
+        when(repository.existsById(1L)).thenReturn(false);
+        assertThrows(ResourceNotFoundException.class, () -> service.save(1L, addressDto));
     }
 }

@@ -25,7 +25,7 @@ import java.util.List;
 @SecurityRequirement(name = "JWT")
 @Slf4j
 @Tag(name = "Restaurants manager controller",
-        description = "This controller allows to watch, support and maintain restaurants and dishes from service.")
+        description = "This controller allows to watch, support and maintain restaurants and dishes of our service.")
 public class RestaurantManagerController {
 
     private final RestaurantService restaurantService;
@@ -33,9 +33,9 @@ public class RestaurantManagerController {
     private final DishService dishService;
 
     @Operation(summary = "Find all restaurants",
-            description = "This method returns all restaurants, stored in database",
+            description = "Returns all restaurants, stored in database",
             responses = @ApiResponse(responseCode = "200",
-                    description = "Returns list RestaurantListView Dtos",
+                    description = "Returns list of RestaurantListView Dtos",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = RestaurantListView.class)),
                             examples = @ExampleObject(value =
@@ -68,7 +68,7 @@ public class RestaurantManagerController {
     }
 
     @Operation(summary = "Find restaurant",
-            description = "This method returns one restaurant from database if present",
+            description = "Returns one restaurant from database if present",
             responses = {@ApiResponse(responseCode = "200",
                     description = "Returns RestaurantPageView Dto",
                     content = {@Content(mediaType = "application/json",
@@ -137,12 +137,12 @@ public class RestaurantManagerController {
                                               "description": "very spicy dishes"
                                             }"""
                             ))})
-           @RequestBody RestaurantPageView restaurant) {
+            @RequestBody RestaurantPageView restaurant) {
         return restaurantService.save(restaurant);
     }
 
     @Operation(summary = "Update restaurant",
-            description = "This method updates specific restaurant",
+            description = "Updates specific restaurant",
             responses = {@ApiResponse(responseCode = "200",
                     description = "Returns RestaurantPageView Dto",
                     content = {@Content(mediaType = "application/json",
@@ -276,7 +276,7 @@ public class RestaurantManagerController {
         return dishService.save(id, dishDto);
     }
 
-    @Operation(summary = "Finds dish",
+    @Operation(summary = "Find dish",
             description = "Returns specific dish of specific restaurant",
             responses = {@ApiResponse(responseCode = "200",
                     description = "Returns DishDto",
@@ -305,7 +305,7 @@ public class RestaurantManagerController {
         return dishService.findByRestaurantIdAndId(id, dishId);
     }
 
-    @Operation(summary = "Update dish method",
+    @Operation(summary = "Update dish",
             description = "Allows to update specific dish of the restaurant",
             responses = {@ApiResponse(responseCode = "200", description = "Returns dishDto",
                     content = {@Content(mediaType = "application/json",
@@ -320,7 +320,10 @@ public class RestaurantManagerController {
                                             }"""
                             ))}),
                     @ApiResponse(responseCode = "404",
-                            description = "Restaurant with id \"X\"  or dish with id \"Y\" not found",
+                            description = "Restaurant with id \"X\" or dish with id \"Y\" not found",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404",
+                            description = "Dish with id \"Y\" not found in restaurant's \"X\" menu",
                             content = @Content)})
 
     @PutMapping("{id}/dishes/{dishId}")
@@ -339,8 +342,7 @@ public class RestaurantManagerController {
                                             {
                                               "name": "Updated dish",
                                               "description": "Fat and tasty",
-                                              "price": 13.99,
-                                              "restaurantName": "And doners for all"
+                                              "price": 13.99
                                             }"""
                             ))})
             @RequestBody DishDto dishDto) {
@@ -387,7 +389,7 @@ public class RestaurantManagerController {
         return restaurantService.findAllReviews(id);
     }
 
-    @Operation(summary = "Delete review method",
+    @Operation(summary = "Delete review",
             description = "Allows to delete review of specific restaurant",
             responses = {@ApiResponse(responseCode = "204", description = "Returns no content",
                     content = @Content),
