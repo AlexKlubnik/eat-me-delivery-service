@@ -21,7 +21,6 @@ public class DishService {
 
     private final DishRepository repository;
     private final DishConverter converter;
-
     private final RestaurantRepository restaurantRepository;
 
 
@@ -54,12 +53,13 @@ public class DishService {
         Long restaurantIdFromDb = dishFromDb.getRestaurant().getId();
         if (Objects.equals(restaurantId, restaurantIdFromDb)) {
             checkAndChangeDish(dish, dishFromDb);
-        }
+        } else throw new ResourceNotFoundException(
+                "Dish with id " + id + " not found in restaurant's " + restaurantId + " menu");
         Dish savedDish = repository.save(dishFromDb);
         return converter.convert(savedDish);
     }
 
-    private static void checkAndChangeDish(DishDto dish, Dish dishFromDb) {
+    private void checkAndChangeDish(DishDto dish, Dish dishFromDb) {
         if (!dish.getName().equals(dishFromDb.getName()))
             dishFromDb.setName(dish.getName());
         if (dish.getPrice() != dishFromDb.getPrice())

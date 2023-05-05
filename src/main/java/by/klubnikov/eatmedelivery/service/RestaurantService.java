@@ -4,6 +4,7 @@ import by.klubnikov.eatmedelivery.converter.RestaurantConverter;
 import by.klubnikov.eatmedelivery.dto.AddressDto;
 import by.klubnikov.eatmedelivery.dto.RestaurantListView;
 import by.klubnikov.eatmedelivery.dto.RestaurantPageView;
+import by.klubnikov.eatmedelivery.dto.UpdateReviewForm;
 import by.klubnikov.eatmedelivery.entity.Restaurant;
 import by.klubnikov.eatmedelivery.error.ResourceNotFoundException;
 import by.klubnikov.eatmedelivery.repository.RestaurantRepository;
@@ -37,27 +38,29 @@ public class RestaurantService {
                         "Restaurant with id " + id + " not found"));
     }
 
-
-    public RestaurantListView save(RestaurantPageView restaurant, AddressDto address) {
-        restaurant.setAddress(address);
+    public RestaurantListView save(RestaurantPageView restaurant) {
         Restaurant restaurantToDb = converter.convertFromPageView(restaurant);
         Restaurant savedRestaurant = repository.save(restaurantToDb);
         return converter.convertToListView(savedRestaurant);
     }
 
-
-    public RestaurantPageView save(Long id, RestaurantPageView restaurant, AddressDto address) {
+    public RestaurantPageView save(Long id, RestaurantPageView restaurant) {
         Restaurant restaurantFromDb = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Restaurant with id " + id + " not found"));
+        AddressDto address = restaurant.getAddress();
         Long addressId = restaurantFromDb.getAddress().getId();
         addressService.save(addressId, address);
+        checkAndChangeRestaurant(restaurant, restaurantFromDb);
+        Restaurant savedRestaurant = repository.save(restaurantFromDb);
+        return converter.convertToPageView(savedRestaurant);
+    }
+
+    private void checkAndChangeRestaurant(RestaurantPageView restaurant, Restaurant restaurantFromDb) {
         if (!restaurant.getName().equals(restaurantFromDb.getName()))
             restaurantFromDb.setName(restaurant.getName());
         if (!restaurant.getDescription().equals(restaurantFromDb.getDescription()))
             restaurantFromDb.setDescription(restaurant.getDescription());
-        Restaurant savedRestaurant = repository.save(restaurantFromDb);
-        return converter.convertToPageView(savedRestaurant);
     }
 
     public void deleteById(Long id) {
@@ -73,15 +76,33 @@ public class RestaurantService {
     }
 
     @Transactional
+    public List<String> saveReview(Long id, String review) {
+        Restaurant restaurant = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
+        List<String> reviews = restaurant.getReviews();
+        reviews.add(review);
+        return reviews;
+    }
+
+    @Transactional
+    public List<String> updateReview(Long id, UpdateReviewForm form) {
+        Restaurant restaurant = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant with id " + id + " not found"));
+        List<String> reviews = restaurant.getReviews();
+        reviews.replaceAll(r -> r.equals(form.getReview()) ? form.getUpdatedReview() : r);
+        return repository.save(restaurant).getReviews();
+    }
+
+    @Transactional
     public void deleteReview(Long id, String review) {
         Restaurant restaurant = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Restaurant with id " + id + " not found"));
-        if (restaurant.getReviews()
-                .stream()
-                .anyMatch(r -> r.equals(review))) {
+        if (restaurant.getReviews().contains(review)) {
             restaurant.getReviews().remove(review);
+            repository.save(restaurant);
         }
     }
-
 }

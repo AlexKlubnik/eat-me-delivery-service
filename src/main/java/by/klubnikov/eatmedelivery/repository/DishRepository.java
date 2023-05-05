@@ -1,7 +1,6 @@
 package by.klubnikov.eatmedelivery.repository;
 
 import by.klubnikov.eatmedelivery.entity.Dish;
-import io.swagger.v3.oas.models.OpenAPI;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -9,18 +9,21 @@ import org.springframework.context.annotation.Primary;
 
 @Data
 @Entity
+@Table(name = "delivery_order_lines")
 public class OrderLine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Min(value = 0, message = "This field can not be negative number")
+    @Min(value = 1, message = "You should order at least one dish")
     private int quantity;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name="dish_id")
     private Dish dish;
+
+    private double price;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
